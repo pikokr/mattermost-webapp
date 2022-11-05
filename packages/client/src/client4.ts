@@ -3527,7 +3527,7 @@ export default class Client4 {
     };
 
     getSystemEmojiImageUrl = (filename: string) => {
-        let item = codePoints.get(filename);
+        const item = codePoints.get(filename);
 
         if (item) {
             return item;
@@ -3539,22 +3539,22 @@ export default class Client4 {
         let emoji;
 
         try {
-            emoji = filename.split('-').map((x) => String.fromCodePoint(parseInt(x, 16))).join('');
+            emoji = filename.split('-').map((x) => twemoji.convert.fromCodePoint(x)).join('');
         } catch (e) {
             emoji = null;
         }
 
-        if (!twemoji.test(emoji)) {
+        const url = twemoji.parse(emoji).match(/src="([^\s]+)"/)?.[1];
+
+        if (!url) {
             return `${this.url}/static/emoji/${filename}${
                 filename.endsWith('.png') ? '' : '.png'
             }`;
         }
 
-        item = `https://twemoji.maxcdn.com/v/latest/svg/${filename}.svg`;
+        codePoints.set(filename, url);
 
-        codePoints.set(filename, item);
-
-        return item;
+        return url;
     };
 
     getCustomEmojiImageUrl = (id: string) => {

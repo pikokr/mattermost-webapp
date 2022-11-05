@@ -9,9 +9,9 @@ import throttle from 'lodash/throttle';
 import {getEmojiImageUrl, isSystemEmoji} from 'mattermost-redux/utils/emoji_utils';
 import {Emoji} from '@mattermost/types/emojis';
 
-import imgTrans from 'images/img_trans.gif';
 import {EmojiCursor} from 'components/emoji_picker/types';
 import {EMOJI_SCROLL_THROTTLE_DELAY} from 'components/emoji_picker/constants';
+import {Client4} from 'mattermost-redux/client';
 
 interface Props {
     emoji: Emoji;
@@ -56,12 +56,14 @@ function EmojiPickerItem({emoji, rowIndex, isSelected, onClick, onMouseOver}: Pr
         const emojiName = emoji.short_name ? emoji.short_name : emoji.name;
         const emojiUnified = emoji.unified ? emoji.unified.toLowerCase() : emoji.name.toLowerCase();
 
+        const url = Client4.getSystemEmojiImageUrl(emojiUnified);
+
         content = (
             <img
                 alt={'emoji image'}
                 data-testid={emoji.short_names}
-                src={imgTrans}
-                className={`emojisprite emoji-category-${emoji.category} emoji-${emojiUnified}`}
+                src={url}
+                className={'emojisprite'}
                 id={`emoji-${emojiUnified}`}
                 aria-label={formatMessage(
                     {
