@@ -2793,9 +2793,11 @@ export default class Client4 {
     };
 
     getSystemEmojiImageUrl = (filename: string) => {
-        const name = filename.endsWith('.png') ? filename.slice(0, filename.length - 4) : filename;
+        if (filename.endsWith('.png')) {
+            return `${this.url}/static/emoji/${filename}`;
+        }
 
-        let item = codePoints.get(name);
+        let item = codePoints.get(filename);
 
         if (item) {
             return item;
@@ -2804,9 +2806,9 @@ export default class Client4 {
         // @ts-expect-error not typed
         const twemoji = window.twemoji;
 
-        item = (`https://twemoji.maxcdn.com/v/latest/svg/${twemoji.convert.toCodePoint(twemoji.convert.fromCodePoint(name))}.svg`);
+        item = (`https://twemoji.maxcdn.com/v/latest/svg/${twemoji.convert.toCodePoint(twemoji.convert.fromCodePoint(filename))}.svg`);
 
-        codePoints.set(name, item);
+        codePoints.set(filename, item);
 
         return item;
     };
