@@ -28,6 +28,7 @@ import {
     ChannelSearchOpts,
     ServerChannel,
 } from '@mattermost/types/channels';
+
 import {Options, StatusOK, ClientResponse, LogLevel, FetchPaginatedThreadOptions} from '@mattermost/types/client4';
 import {Compliance} from '@mattermost/types/compliance';
 import {
@@ -149,6 +150,8 @@ export const suitePluginIds = {
     nps: 'com.mattermost.nps',
     channelExport: 'com.mattermost.plugin-channel-export',
 };
+
+const codePoints = new Map<string, string>();
 
 export default class Client4 {
     logToConsole = false;
@@ -2790,8 +2793,22 @@ export default class Client4 {
     };
 
     getSystemEmojiImageUrl = (filename: string) => {
-        const extension = filename.endsWith('.png') ? '' : '.png';
-        return `${this.url}/static/emoji/${filename}${extension}`;
+        const name = filename.endsWith('.png') ? filename.slice(0, filename.length - 4) : filename;
+
+        let item = codePoints.get(name);
+
+        if (item) {
+            return item;
+        }
+
+        // @ts-expect-error not typed
+        const twemoji = window.twemoji;
+
+        item = (`https://twemoji.maxcdn.com/v/latest/svg/${twemoji.convert.toCodePoint(twemoji.convert.fromCodePoint(name))}.svg`);
+
+        codePoints.set(name, item);
+
+        return item;
     };
 
     getCustomEmojiImageUrl = (id: string) => {
